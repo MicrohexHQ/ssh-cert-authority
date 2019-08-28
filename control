@@ -1,0 +1,7 @@
+Package: SSH Cert Authority
+Version: 1.0-1
+Section: base
+Priority: optional
+Architecture: amd64
+Maintainer: Brandon Arvanaghi <brandon@gemini.com>
+Description: Request and issue SSH certificates by interacting with Gemini's internal SSH CA
