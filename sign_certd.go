@@ -575,7 +575,7 @@ func (h *certRequestHandler) signOrRejectRequest(rw http.ResponseWriter, req *ht
 		return
 	}
 
-	signerFp := ssh_ca_util.MakeFingerprint(signedCert.SignatureKey.Marshal())
+	signerFp := ssh_ca_util.MakeFingerprint(signedCert.SignatureKey.Marshal())	
 
 	// Verifying that the cert being posted to us here matches the one in the
 	// request. That is, that an attacker isn't using an old signature to sign a
@@ -590,6 +590,16 @@ func (h *certRequestHandler) signOrRejectRequest(rw http.ResponseWriter, req *ht
 		http.Error(rw, "Signature was valid, but cert didn't match.", http.StatusBadRequest)
 		return
 	}
+
+	requesterFp := ssh_ca_util.MakeFingerprint(requestedCert.Key.Marshal())
+
+	// Make sure the key attempting to sign the request is not the same as the key in the CSR
+	if signerFp == requesterFp {
+		err = errors.New("Signed by the same key as key in request")
+		http.Error(rw, fmt.Sprintf("%v", err), http.StatusBadRequest)		
+		return
+	}	
+
 	log.Printf("Signature for serial %d id %s received from %s (%s) @ %s and determined valid\n",
 		signedCert.Serial, requestID, signerFp, envConfig.AuthorizedSigners[signerFp], req.RemoteAddr)
 	if req.Method == "POST" {
