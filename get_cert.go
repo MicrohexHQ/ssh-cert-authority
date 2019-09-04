@@ -73,17 +73,7 @@ func addCertToAgent(cert *ssh.Certificate, sshDir string) error {
 	if secondsRemaining < 1 {
 		return fmt.Errorf("This certificate has already expired.")
 	}
-	pubKeyPath, err := findKeyLocally(cert.Key, sshDir)
-	privKeyPath := strings.Replace(pubKeyPath, ".pub", "", 1)
-	fmt.Printf("pubkey %s, privkey %s\n", pubKeyPath, privKeyPath)
-	cmd := exec.Command("ssh-add", "-t", fmt.Sprintf("%d", secondsRemaining), privKeyPath)
-	cmd.Stdout = os.Stdout
-	cmd.Stderr = os.Stderr
-	cmd.Stdin = os.Stdin
-	err = cmd.Run()
-	if err != nil {
-		return fmt.Errorf("Error in ssh-add: %s", err)
-	}
+
 	return nil
 }
 
